@@ -9,7 +9,6 @@ app = Flask(__name__)
 user_data = {}
 
 
-# --- ОБРАБОТЧИКИ ТЕЛЕГРАМ-БОТА ---
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
   welcome_text = (
@@ -133,10 +132,8 @@ def process_price2(message):
     bot.register_next_step_handler(msg, process_price2)
 
 
-# --- FLASK МАРШРУТЫ ДЛЯ РАБОТЫ ЧЕРЕЗ WEBHOOK ---
 @app.route(f'/{TOKEN}', methods=['POST'])
 def webhook():
-  """Сюда Telegram присылает обновления"""
   if request.headers.get('content-type') == 'application/json':
     json_string = request.get_data().decode('utf-8')
     update = telebot.types.Update.de_json(json_string)
@@ -147,13 +144,9 @@ def webhook():
 
 @app.route('/')
 def index():
-  """Устанавливаем вебхук при обращениях"""
-  bot.remove_webhook()
-  bot.set_webhook(url=f'https://grocery-bot.onrender.com/{TOKEN}')
   return 'Grocery Bot is running!', 200
 
 
 if __name__ == '__main__':
-  # Сервер слушаем строго на порту, который запрашивает Render
   port = int(os.environ.get('PORT', 5000))
   app.run(host='0.0.0.0', port=port)
