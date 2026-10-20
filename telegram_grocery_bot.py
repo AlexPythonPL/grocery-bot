@@ -3,7 +3,7 @@ from flask import Flask, request
 import telebot
 
 TOKEN = os.environ.get('BOT_TOKEN')
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, threaded=False, num_threads=0)
 app = Flask(__name__)
 
 # Автоматическая установка вебхука при старте на Render
