@@ -3,13 +3,11 @@ from flask import Flask, request
 import telebot
 
 TOKEN = os.environ.get('BOT_TOKEN')
-bot = telebot.TeleBot(TOKEN, threaded=False, num_threads=0)
+bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# Автоматическая установка вебхука при старте на Render
-WEBHOOK_URL = f"https://grocery-bot-rczc.onrender.com/{TOKEN}"
-bot.remove_webhook()
-bot.set_webhook(url=WEBHOOK_URL)
+# Убираем блокирующий set_webhook из глобальной области видимости, 
+# чтобы сервер мгновенно открывал порт и проходил проверку Render.
 
 user_data = {}
 
