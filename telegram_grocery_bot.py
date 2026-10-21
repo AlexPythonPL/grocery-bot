@@ -2,8 +2,8 @@ import os
 import telebot
 from flask import Flask, request
 
-TOKEN = os.environ.get('BOT_TOKEN')
-bot = telebot.TeleBot(TOKEN, threaded=False)
+TOKEN = '8902402759:AAEhAoRi4NhHY99GBgAESaXnEf0cMUPNd98'
+bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
 user_data = {}
@@ -12,9 +12,9 @@ user_data = {}
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
   welcome_text = (
-      'Привіт! Я твій Розумний Помічник у магазині. 🛒\n\nЯ допоможу дізнатися'
-      ' реальну ціну за 1 кг/л та обрати вигідніший товар!\n\nНатисни /calc'
-      ' або напиши будь-яке повідомлення, щоб почати розрахунок.'
+      "Привіт! Я твій Розумний Помічник у магазині. 🛒\n\n"
+      "Я допоможу дізнатися реальну ціну за 1 кг/л та обрати вигідніший товар!\n\n"
+      "Натисни /calc або напиши будь-яке повідомлення, щоб почати розрахунок."
   )
   bot.reply_to(message, welcome_text)
 
@@ -26,7 +26,7 @@ def start_calc(message):
   user_data[chat_id] = {}
 
   msg = bot.send_message(
-      chat_id, 'Введіть назву **першого** товару :', parse_mode='Markdown'
+      chat_id, "Введіть назву **першого** товару :", parse_mode="Markdown"
   )
   bot.register_next_step_handler(msg, process_name1)
 
@@ -51,7 +51,7 @@ def process_weight1(message):
     bot.register_next_step_handler(msg, process_price1)
   except ValueError:
     msg = bot.send_message(
-        chat_id, 'Будь ласка, введіть число (вагу в грамах)! Спробуйте ще раз:'
+        chat_id, "Будь ласка, введіть число (вагу в грамах)! Спробуйте ще раз:"
     )
     bot.register_next_step_handler(msg, process_weight1)
 
@@ -60,11 +60,11 @@ def process_price1(message):
   chat_id = message.chat.id
   try:
     user_data[chat_id]['price1'] = float(message.text.replace(',', '.'))
-    msg = bot.send_message(chat_id, 'Тепер введіть назву **другого** товару :')
+    msg = bot.send_message(chat_id, "Тепер введіть назву **другого** товару :")
     bot.register_next_step_handler(msg, process_name2)
   except ValueError:
     msg = bot.send_message(
-        chat_id, 'Будь ласка, введіть число (ціну)! Спробуйте ще раз:'
+        chat_id, "Будь ласка, введіть число (ціну)! Спробуйте ще раз:"
     )
     bot.register_next_step_handler(msg, process_price1)
 
@@ -89,7 +89,7 @@ def process_weight2(message):
     bot.register_next_step_handler(msg, process_price2)
   except ValueError:
     msg = bot.send_message(
-        chat_id, 'Будь ласка, введіть число (вагу)! Спробуйте ще раз:'
+        chat_id, "Будь ласка, введіть число (вагу)! Спробуйте ще раз:"
     )
     bot.register_next_step_handler(msg, process_weight2)
 
@@ -104,48 +104,44 @@ def process_price2(message):
     res2 = (d['price2'] / d['netto2']) * 1000
 
     result_text = (
-        f"📊 **Результати розрахунку:**\n\n• **{d['name1']}**: {res1:.2f} грн"
-        f" за 1 кг/л\n• **{d['name2']}**: {res2:.2f} грн за 1 кг/л\n\n"
+        f"📊 **Результати розрахунку:**\n\n"
+        f"• **{d['name1']}**: {res1:.2f} грн за 1 кг/л\n"
+        f"• **{d['name2']}**: {res2:.2f} грн за 1 кг/л\n\n"
     )
 
     if res1 > res2:
       diff = res1 - res2
-      result_text += (
-          f"💡 **{d['name2']}** вигідніше на **{diff:.2f} грн/кг**!"
-      )
+      result_text += f"💡 **{d['name2']}** вигідніше на **{diff:.2f} грн/кг**!"
     elif res2 > res1:
       diff = res2 - res1
-      result_text += (
-          f"💡 **{d['name1']}** вигідніше на **{diff:.2f} грн/кг**!"
-      )
+      result_text += f"💡 **{d['name1']}** вигідніше на **{diff:.2f} грн/кг**!"
     else:
-      result_text += '⚖️ Ціни за 1 кг/л однакові!'
+      result_text += "⚖️ Ціни за 1 кг/л однакові!"
 
     result_text += (
-        '\n\nЩоб зробити новий розрахунок, просто напишіть будь-що у чат.'
+        "\n\nЩоб зробити новий розрахунок, просто напишіть будь-що у чат."
     )
 
-    bot.send_message(chat_id, result_text, parse_mode='Markdown')
+    bot.send_message(chat_id, result_text, parse_mode="Markdown")
 
   except ValueError:
     msg = bot.send_message(
-        chat_id, 'Будь ласка, введіть число (ціну)! Спробуйте ще раз:'
+        chat_id, "Будь ласка, введіть число (ціну)! Спробуйте ще раз:"
     )
     bot.register_next_step_handler(msg, process_price2)
 
 
-@app.route(f'/{TOKEN}', methods=['POST'])
+# Вебхук-маршрут для приема запросов от Telegram
+@app.route(f"/{TOKEN}", methods=['POST'])
 def webhook():
   if request.headers.get('content-type') == 'application/json':
     json_string = request.get_data().decode('utf-8')
     update = telebot.types.Update.de_json(json_string)
     bot.process_new_updates([update])
-    return '!', 200
-  return 'Forbidden', 403
+    return "!", 200
+  return "Forbidden", 403
 
 
 @app.route('/')
 def index():
-  return 'Grocery Bot is running!', 200
-
-
+  return "Grocery Bot is running!", 200
