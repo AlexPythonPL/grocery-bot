@@ -2,9 +2,11 @@ import os
 import telebot
 from flask import Flask, request
 
-# Безопасно считываем токен из переменных окружения Render
-TOKEN = os.environ.get('BOT_TOKEN')
-bot = telebot.TeleBot(TOKEN)
+# Защитная отладка: посмотрим, что реально видит Render
+token = os.environ.get('BOT_TOKEN')
+print(f"DEBUG_CHECK -> BOT_TOKEN length: {len(token) if token else 'NOT FOUND'}")
+
+bot = telebot.TeleBot(token)
 app = Flask(__name__)
 
 user_data = {}
