@@ -3,7 +3,8 @@ import telebot
 from flask import Flask, request
 
 # Читаем токен и выводим его длину для отладки в логах Render
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
+# .strip() автоматически удалит случайно попавшие пробелы или переносы строк
+BOT_TOKEN = os.environ.get('BOT_TOKEN', '').strip()
 print(f"DEBUG_CHECK -> BOT_TOKEN length: {len(BOT_TOKEN) if BOT_TOKEN else 'NOT FOUND'}")
 
 if not BOT_TOKEN:
