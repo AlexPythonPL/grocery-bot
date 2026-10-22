@@ -2,7 +2,8 @@ import os
 import telebot
 from flask import Flask, request
 
-TOKEN = '8902402759:AAEhAoRi4NhHY99GBgAESaXnEf0cMUPNd98'
+# Безопасно считываем токен из переменных окружения Render
+TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
